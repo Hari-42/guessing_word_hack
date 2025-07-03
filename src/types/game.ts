@@ -3,6 +3,7 @@ export interface Player {
   name: string;
   score: number;
   isHost: boolean;
+  isBot?: boolean;
 }
 
 export interface ChatMessage {

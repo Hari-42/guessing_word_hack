@@ -28,95 +28,100 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-600 flex items-center justify-center p-4">
-      <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 max-w-md w-full shadow-2xl border border-white/20">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-700 via-purple-700 to-pink-600 flex items-center justify-center p-4">
+      <div className="bg-gray-900/90 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl border border-gray-700/50">
         <div className="text-center mb-8">
-          <div className="bg-white/20 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center border border-indigo-400/50 shadow-lg shadow-indigo-500/30">
             <Users className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Spiel-Lobby</h1>
-          <div className="flex items-center justify-center gap-2 bg-white/20 rounded-lg p-3">
+          <h1 className="text-3xl font-bold text-white mb-2">Game Lobby</h1>
+          <div className="flex items-center justify-center gap-2 bg-gray-800/80 rounded-lg p-3 border border-gray-700/50">
             <span className="text-white font-mono text-lg">{lobbyId}</span>
             <button
               onClick={copyLobbyId}
-              className="text-white hover:text-blue-200 transition-colors"
+              className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              aria-label="Copy lobby code"
             >
-              <Copy className="w-5 h-5" />
+              {copied ? (
+                <span className="text-green-400 text-sm font-medium">Copied!</span>
+              ) : (
+                <Copy className="w-5 h-5 text-gray-300" />
+              )}
             </button>
           </div>
-          {copied && <p className="text-green-300 text-sm mt-2">In Zwischenablage kopiert!</p>}
         </div>
 
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Spieler ({players.length})</h2>
-          <div className="space-y-3">
-            {players.map((player) => (
-              <div
-                key={player.id}
-                className={`flex items-center justify-between p-3 rounded-lg ${
-                  player.id === playerId
-                    ? 'bg-blue-500/30 border border-blue-400/50'
-                    : 'bg-white/10'
-                }`}
+          <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+            <Users className="w-5 h-5 text-indigo-400" />
+            Players ({players.length}/4)
+          </h2>
+          <ul className="space-y-3">
+            {players.map(player => (
+              <li 
+                key={player.id} 
+                className="flex items-center gap-3 bg-gray-800/60 p-3 rounded-lg border border-gray-700/50"
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    player.name.startsWith('Bot')
-                      ? 'bg-gradient-to-r from-green-500 to-emerald-500'
-                      : 'bg-gradient-to-r from-pink-500 to-purple-500'
-                  }`}>
-                    {player.name.startsWith('Bot') ? (
-                      <Bot className="w-4 h-4 text-white" />
-                    ) : (
-                      <span className="text-white font-semibold text-sm">
-                        {player.name.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-white font-medium">{player.name}</span>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                  {player.isHost ? (
+                    <Crown className="w-5 h-5 text-yellow-300" />
+                  ) : player.isBot ? (
+                    <Bot className="w-5 h-5 text-gray-300" />
+                  ) : (
+                    <Users className="w-5 h-5 text-white" />
+                  )}
                 </div>
-                {player.isHost && (
-                  <Crown className="w-5 h-5 text-yellow-400" />
-                )}
-              </div>
+                <div className="flex-1">
+                  <p className="font-medium text-white">
+                    {player.name} {player.id === playerId && <span className="text-indigo-400">(You)</span>}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    {player.isHost ? 'Host' : player.isBot ? 'Bot' : 'Player'}
+                  </p>
+                </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
         {isHost && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <button
               onClick={onAddBot}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg font-semibold transition-all border border-green-500/30"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gray-800/80 hover:bg-gray-700/80 text-white rounded-lg transition-colors border border-gray-700/50"
+              disabled={players.length >= 4}
             >
-              <Bot className="w-4 h-4" />
-              Bot hinzufügen
+              <Bot className="w-5 h-5" />
+              Add Bot Player
             </button>
             
             <button
               onClick={onStartGame}
               disabled={players.length < 2}
-              className={`w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
-                players.length >= 2
-                  ? 'bg-green-500 hover:bg-green-600 text-white hover:scale-105'
-                  : 'bg-gray-500 text-gray-300 cursor-not-allowed'
+              className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${
+                players.length < 2
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
               }`}
             >
               <Play className="w-5 h-5" />
-              Spiel starten
+              Start Game
             </button>
+            
             {players.length < 2 && (
-              <p className="text-white/70 text-sm text-center">
-                Mindestens 2 Spieler benötigt
+              <p className="text-center text-sm text-indigo-400 mt-2">
+                Need at least 2 players to start
               </p>
             )}
           </div>
         )}
 
         {!isHost && (
-          <p className="text-center text-white/70">
-            Warte darauf, dass der Host das Spiel startet...
-          </p>
+          <div className="bg-gray-800/60 rounded-lg p-4 border border-gray-700/50">
+            <p className="text-center text-gray-300">
+              Waiting for host to start the game...
+            </p>
+          </div>
         )}
       </div>
     </div>
